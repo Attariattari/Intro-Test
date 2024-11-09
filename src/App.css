@@ -11,3 +11,7 @@ body {
   margin: 0px;
   background-color: #c0d6f9;
 }
+
+button {
+  color: white !important;
+}
