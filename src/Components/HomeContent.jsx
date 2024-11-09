@@ -134,15 +134,24 @@ function HomeContent() {
             </div>
             <div className="property-view-last-section">
               <div className="last-section-data">
-                <img src="/public/Union (2).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMl92am90anc=/drilldown"
+                  alt=""
+                />
                 <div>5 Bedroom</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union.svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fcm1oemRv/drilldown"
+                  alt=""
+                />
                 <div>3 Bathrooms</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union (1).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMV9wb3JjcDc=/drilldown"
+                  alt=""
+                />
                 <div>72 m2</div>
               </div>
             </div>
@@ -160,15 +169,24 @@ function HomeContent() {
             </div>
             <div className="property-view-last-section">
               <div className="last-section-data">
-                <img src="/public/Union (2).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMl92am90anc=/drilldown"
+                  alt=""
+                />
                 <div>5 Bedroom</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union.svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fcm1oemRv/drilldown"
+                  alt=""
+                />
                 <div>3 Bathrooms</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union (1).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMV9wb3JjcDc=/drilldown"
+                  alt=""
+                />
                 <div>72 m2</div>
               </div>
             </div>
@@ -186,15 +204,24 @@ function HomeContent() {
             </div>
             <div className="property-view-last-section">
               <div className="last-section-data">
-                <img src="/public/Union (2).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMl92am90anc=/drilldown"
+                  alt=""
+                />
                 <div>5 Bedroom</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union.svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fcm1oemRv/drilldown"
+                  alt=""
+                />
                 <div>3 Bathrooms</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union (1).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMV9wb3JjcDc=/drilldown"
+                  alt=""
+                />
                 <div>72 m2</div>
               </div>
             </div>
@@ -212,15 +239,24 @@ function HomeContent() {
             </div>
             <div className="property-view-last-section">
               <div className="last-section-data">
-                <img src="/public/Union (2).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMl92am90anc=/drilldown"
+                  alt=""
+                />
                 <div>5 Bedroom</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union.svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fcm1oemRv/drilldown"
+                  alt=""
+                />
                 <div>3 Bathrooms</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union (1).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMV9wb3JjcDc=/drilldown"
+                  alt=""
+                />
                 <div>72 m2</div>
               </div>
             </div>
@@ -238,15 +274,24 @@ function HomeContent() {
             </div>
             <div className="property-view-last-section">
               <div className="last-section-data">
-                <img src="/public/Union (2).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMl92am90anc=/drilldown"
+                  alt=""
+                />
                 <div>5 Bedroom</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union.svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fcm1oemRv/drilldown"
+                  alt=""
+                />
                 <div>3 Bathrooms</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union (1).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMV9wb3JjcDc=/drilldown"
+                  alt=""
+                />
                 <div>72 m2</div>
               </div>
             </div>
@@ -264,15 +309,24 @@ function HomeContent() {
             </div>
             <div className="property-view-last-section">
               <div className="last-section-data">
-                <img src="/public/Union (2).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMl92am90anc=/drilldown"
+                  alt=""
+                />
                 <div>5 Bedroom</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union.svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fcm1oemRv/drilldown"
+                  alt=""
+                />
                 <div>3 Bathrooms</div>
               </div>
               <div className="last-section-data">
-                <img src="/public/Union (1).svg" alt="" />
+                <img
+                  src="https://res-console.cloudinary.com/dg5gwixf1/thumbnails/v1/image/upload/v1731170000/VW5pb25fMV9wb3JjcDc=/drilldown"
+                  alt=""
+                />
                 <div>72 m2</div>
               </div>
             </div>
