@@ -313,7 +313,7 @@ span {
 }
 
 .HomeContent-second-content-property-view img {
-    width: 200px;
+    width: 100%;
 }
 
 .property-view-data .title {
@@ -424,7 +424,7 @@ span {
 }
 
 .HomeContent-update-data img {
-    width: 250px;
+    width: 100%;
 }
 
 .update-data-pic-tite {
