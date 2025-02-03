@@ -45,7 +45,6 @@ import Order from "./Zara_Admin/Order/Order.jsx";
 import OrderDetails from "./Zara_Admin/OrderDetails/OrderDetails.jsx";
 import Gallery from "./Zara_Admin/Gallery/Gallery";
 import Uploadimages from "./Zara_Admin/Gallery/Upload/Uploadimages.jsx";
-import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const [hasVisited, setHasVisited] = useState(
@@ -90,7 +89,6 @@ function App() {
 
   return (
     <div>
-      <Analytics />
       <Router>
         <Routes>
           <Route
