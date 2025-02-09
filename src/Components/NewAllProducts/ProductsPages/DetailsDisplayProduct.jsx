@@ -14,8 +14,9 @@ function DetailsDisplayProduct({ data, loading }) {
 
   const [wishlistStatus, setWishlistStatus] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [cartPopup, setCartPopup] = useState(false);
+  const [cartPopup, setCartPopup] = useState(null);
   const [selectproductid, setSelectproductid] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -78,9 +79,12 @@ function DetailsDisplayProduct({ data, loading }) {
 
   const handleaddtocart = (productId) => {
     setSelectproductid(productId);
-    setCartPopup(true);
+    setCartPopup((prev) => (prev === productId ? null : productId));
   };
-
+  const handleSizeSelect = (size) => {
+    setSelectedSize(size); // Size ko select karo
+    // Yahan setCartPopup(null) mat karo taake popup close na ho
+  };
   const closePopup = () => {
     setCartPopup(false);
   };
@@ -120,12 +124,34 @@ function DetailsDisplayProduct({ data, loading }) {
                     e.stopPropagation();
                   }}
                 >
-                  {!cartPopup && (
+                  {cartPopup !== product._id && (
                     <div className="AddToCartIcon" title="Add to Cart">
                       <GoPlus />
                     </div>
                   )}
-                  {cartPopup && <div className="Size-Popup active">hello</div>}
+                  {cartPopup === product._id && (
+                    <div className="Size-Popup active">
+                      <div className="Size-area">
+                        {product.variations && product.variations.length > 0 ? (
+                          product.variations
+                            .flatMap((variation) => variation.size)
+                            .map((size, index) => (
+                              <button
+                                key={index}
+                                className={
+                                  selectedSize === size ? "selected" : ""
+                                }
+                                onClick={() => handleSizeSelect(size)}
+                              >
+                                {size}
+                              </button>
+                            ))
+                        ) : (
+                          <p>No sizes available</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="Detailed">
                   <div className="DetailedTitleandSVG">

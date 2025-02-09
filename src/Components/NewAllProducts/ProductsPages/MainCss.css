@@ -176,8 +176,8 @@
   z-index: 10;
   bottom: 0;
   width: 100%;
-  height: 200px;
-  background-color: #333333bb;
+  height: auto;
+  background-color: var(--bg-color);
   transform: translateY(100%);
   opacity: 0;
   visibility: hidden;
@@ -192,6 +192,19 @@
   visibility: visible;
 }
 
+.Size-area {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+  gap: 10px;
+  padding: 10px;
+}
+
+.Size-area button {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  height: 30px;
+}
 
 .Detailed {
   width: 100%;

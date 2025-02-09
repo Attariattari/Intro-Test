@@ -89,6 +89,7 @@ function New() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
   useEffect(() => {
     const storedComponent = localStorage.getItem("selectedComponent");
     if (storedComponent) {
@@ -110,11 +111,29 @@ function New() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const [activeFilter, setActiveFilter] = useState(null); // State to track active filter
+  const [activeFilter, setActiveFilter] = useState(null);
+  const filterRef = useRef(null);
+
+  // Close filter box if clicked outside
+  useEffect(() => {
+    if (!activeFilter) return; // Only run when a filter is active
+
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setActiveFilter(null);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [activeFilter]); // Dependency added to only run when activeFilter changes
 
   const toggleFilterBox = (filterName) => {
     setActiveFilter((prev) => (prev === filterName ? null : filterName));
   };
+
   const colors = [
     "red",
     "blue",
@@ -129,7 +148,6 @@ function New() {
   const [isWrapped, setIsWrapped] = useState(false);
 
   useEffect(() => {
-    // If the number of colors exceeds 6, make the container wrap the elements
     if (colors.length > 6) {
       setIsWrapped(true);
     } else {
@@ -141,42 +159,6 @@ function New() {
 
   const handleChange = (newRange) => {
     setPriceRange(newRange);
-  };
-
-  const trackStyle = {
-    backgroundColor: "#000", // Black track
-  };
-
-  const handleStyle = [
-    {
-      borderColor: "#000", // Black border for the thumb
-      backgroundColor: "#000", // Black background for the thumb
-      borderWidth: "2px",
-      width: "15px",
-      height: "15px",
-    },
-    {
-      borderColor: "#000", // Black border for the thumb
-      backgroundColor: "#000", // Black background for the thumb
-      borderWidth: "2px",
-      width: "15px",
-      height: "15px",
-    },
-  ];
-
-  const railStyle = {
-    backgroundColor: "#333", // Dark grey rail
-  };
-
-  const containerStyle = {
-    padding: "20px",
-    backgroundColor: "#000", // Black background for the container
-    color: "#fff", // White text color for contrast
-  };
-
-  const sliderStyle = {
-    width: "100%",
-    margin: "20px 0",
   };
 
   return (
@@ -198,7 +180,10 @@ function New() {
                 className={`Productfilterveiw__filter-item ${
                   activeFilter === filter ? "active" : ""
                 }`}
-                onClick={() => toggleFilterBox(filter)}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevents immediate closing when clicked
+                  toggleFilterBox(filter);
+                }}
               >
                 {filter}
               </div>
@@ -207,7 +192,11 @@ function New() {
 
           {/* Conditional box rendering */}
           {activeFilter && (
-            <div className="filter-box">
+            <div
+              className="filter-box"
+              ref={filterRef}
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="filter-box__content">
                 {activeFilter === "SORT BY" && (
                   <div className="sort-options">
@@ -251,7 +240,6 @@ function New() {
                       textAlign: "center",
                     }}
                   >
-                    {" "}
                     <div>
                       <p>
                         Selected Price Range: ${priceRange[0]} - $
