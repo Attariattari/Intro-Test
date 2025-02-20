@@ -10,6 +10,7 @@ function SmallDisplayProducts({ data, loading }) {
   const [cartPopup, setCartPopup] = useState(false);
   const [selectproductid, setSelectproductid] = useState(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -17,13 +18,27 @@ function SmallDisplayProducts({ data, loading }) {
   const handleNavigate = (product) => {
     navigate(`/SingleProduct/${product.Name}/${product._id}`);
   };
+
   const handleaddtocart = (productId) => {
     setSelectproductid(productId);
     setCartPopup(true);
   };
+
   const closePopup = () => {
     setCartPopup(false); // Hide popup
   };
+
+  useEffect(() => {
+    if (cartPopup) {
+      document.body.style.overflow = "hidden"; // Disable scroll
+    } else {
+      document.body.style.overflow = "auto"; // Restore scroll
+    }
+    return () => {
+      document.body.style.overflow = "auto"; // Cleanup on unmount
+    };
+  }, [cartPopup]);
+
   return (
     <div className="product-grid-container">
       {loading && (
@@ -46,8 +61,8 @@ function SmallDisplayProducts({ data, loading }) {
                 className="CartSmallButtonArea"
                 title="Add to Cart"
                 onClick={(e) => {
-                  handleaddtocart(product._id);
-                  e.stopPropagation();
+                  e.stopPropagation(); // Parent click event prevent karne ke liye
+                  handleNavigate(product); // Navigate bhi kar dega
                 }}
               >
                 <GoPlus />
@@ -56,13 +71,13 @@ function SmallDisplayProducts({ data, loading }) {
           </>
         ))}
       </div>
-      {cartPopup && (
+      {/* {cartPopup && (
         <Cartpopup
           cartPopup={cartPopup}
           closePopup={closePopup}
           productid={selectproductid}
         />
-      )}
+      )} */}
       <Footer />
     </div>
   );

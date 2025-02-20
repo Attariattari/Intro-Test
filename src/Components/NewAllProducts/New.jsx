@@ -3,29 +3,28 @@ import "./New.css";
 import Navbar from "../Navbar/Navbar";
 import SamallDipalyProducts from "../NewAllProducts/ProductsPages/SamallDipalyProducts";
 import DetailsDisplayProduct from "../NewAllProducts/ProductsPages/DetailsDisplayProduct";
-import { useParams } from "react-router-dom";
 import axios from "axios";
 import { userContext } from "./../../Context/UserContext";
 import "react-range-slider-input/dist/style.css";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import { useParams } from "react-router-dom";
 
 function New() {
   const [selectedComponent, setSelectedComponent] = useState(
     localStorage.getItem("selectedComponent") || "DetailsDisplay"
   );
+  const { cid, csid } = useParams();
   const [isScrolled, setIsScrolled] = useState(false);
   const [state, setState] = useState({
     data: [],
     loading: false,
   });
   const { token } = useContext(userContext);
-
   const handleComponentChange = (component) => {
     setSelectedComponent(component);
     localStorage.setItem("selectedComponent", component);
   };
-  const { cid, csid } = useParams();
 
   const fetchProducts = async () => {
     setState((prevState) => ({

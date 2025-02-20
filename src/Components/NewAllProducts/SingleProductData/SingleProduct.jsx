@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Navbar from "../../Navbar/Navbar";
+import { useParams } from "react-router-dom";
 import Footer from "../../Footer/Footer.jsx";
 import "swiper/css/pagination";
 import "./SingleProduct.css";
@@ -11,14 +12,66 @@ import LikeSameWithProductData from "./LikeSomeProductsDataView/LikeSameWithProd
 import AllProductDataView from "./AllProductDataView/AllProductDataView";
 import Composetion from "./CompositionArea/Composetion";
 import { ZaraProducts } from "../../DummyData/Data";
+import axios from "axios";
+import Spinner from "../../../Spinner.jsx";
 
 function SingleProduct() {
-  const womenProducts = [ZaraProducts.Women.SATINY_BLAZER];
+  const womenProduct = [ZaraProducts.Women.SATINY_BLAZER];
   const [isexpanded, setIsexpanded] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   const [showSidePopup, setShowSidePopup] = useState(false);
   const [showMobileDisplay, setShowMobileDisplay] = useState(true);
+  const { id } = useParams();
+  const [state, setState] = useState({
+    data: null,
+    loading: false,
+    isexpanded: false,
+    expanded: false,
+    activeSlide: 0,
+    showSidePopup: false,
+    showMobileDisplay: true,
+  });
+  const fetchproduct = async () => {
+    setState((prevState) => ({ ...prevState, loading: true }));
+    try {
+      const response = await axios.get(`http://localhost:1122/Product/${id}`);
+      const data = response.data;
+      setState({ data, loading: false });
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+      setState({ data: null, loading: false });
+    }
+  };
+
+  useEffect(() => {
+    fetchproduct();
+  }, []);
+  const [activeVariation, setActiveVariation] = useState(null);
+  const [displayImages, setDisplayImages] = useState([]);
+
+  useEffect(() => {
+    if (
+      state.data &&
+      state.data.variations &&
+      state.data.variations.length > 0
+    ) {
+      const firstVariation = state.data.variations[0];
+      setActiveVariation(firstVariation);
+
+      // ✅ Default state me "Main Image + First Variation Images"
+      setDisplayImages([state.data.MainImage, ...firstVariation.image]);
+    }
+  }, [state.data]);
+
+  const handleVariationChange = (variation) => {
+    setActiveVariation(variation);
+    setDisplayImages(variation.image); // ✅ Sirf is variation ki images
+  };
+  const womenProducts = activeVariation ? [activeVariation] : [];
+  console.log("Active Variation:", activeVariation);
+
   const swiperRef = useRef(null);
 
   const toggleExpanded = () => {
@@ -52,7 +105,6 @@ function SingleProduct() {
     setShowSidePopup(!showSidePopup);
   };
   useEffect(() => {
-    // Update showMobileDisplay based on showSidePopup state and screen width
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setShowMobileDisplay(!showSidePopup);
@@ -79,6 +131,9 @@ function SingleProduct() {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     toggleIsexpanded();
   };
+
+  if (state.loading) return <Spinner />;
+  if (!state.data) return <p>No Product Found</p>;
 
   return (
     <div>
@@ -121,32 +176,40 @@ function SingleProduct() {
                 setActiveSlide(swiper.realIndex);
               }}
             >
-              {womenProducts[0].images.map((imageUrl, index) => (
+              {/* ✅ Ab `displayImages` ka use ho raha hai */}
+              {displayImages.map((imageUrl, index) => (
                 <SwiperSlide key={index}>
                   <div className="ImagesCarosual">
                     <div className="imageWrapper">
-                      <img src={imageUrl} alt="" />
+                      <img src={imageUrl} alt={`Variation ${index}`} />
                     </div>
                   </div>
                 </SwiperSlide>
               ))}
+
+              {/* ✅ Thumbnail Images */}
               <div className="ImagesForCarsualUpdates">
-                {womenProducts[0].images.map((imageUrl, index) => (
+                {displayImages.map((imageUrl, index) => (
                   <div
                     key={index}
                     className={`UpdaterImage ${
                       index === activeSlide ? "active" : ""
                     }`}
-                    onClick={() => handleImageClick(index)} // Attach onClick event to update Swiper
+                    onClick={() => handleImageClick(index)}
                   >
-                    <img src={imageUrl} alt="" />
+                    <img src={imageUrl} alt={`Thumbnail ${index}`} />
                   </div>
                 ))}
               </div>
             </Swiper>
           </div>
           <div className="AllProductDataView">
-            <AllProductDataView womenProducts={womenProducts} />
+            <AllProductDataView
+              product={state.data}
+              activeVariation={activeVariation}
+              setActiveVariation={setActiveVariation} // ✅ Ab ye bhi pass ho raha hai
+              womenProducts={womenProduct}
+            />
           </div>
         </div>
       </div>
@@ -174,7 +237,7 @@ function SingleProduct() {
             </div>
           </div>
           <MobileDeviceDisplaydetails
-            womenProducts={womenProducts}
+            womenProducts={womenProduct}
             isexpanded={isexpanded}
             toggleIsexpanded={toggleIsexpanded}
           />

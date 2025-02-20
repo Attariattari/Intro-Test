@@ -7,16 +7,14 @@ import Spinner from "../../../Spinner";
 import axios from "axios";
 import { userContext } from "../../../Context/UserContext";
 import Swal from "sweetalert2";
+import Cartpopup from "./Cartpopup";
 
 function DetailsDisplayProduct({ data, loading }) {
   const navigate = useNavigate();
   const { token } = useContext(userContext);
-
   const [wishlistStatus, setWishlistStatus] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [cartPopup, setCartPopup] = useState(null);
-  const [selectproductid, setSelectproductid] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -77,17 +75,30 @@ function DetailsDisplayProduct({ data, loading }) {
     navigate(`/SingleProduct/${product.Name}/${product._id}`);
   };
 
-  const handleaddtocart = (productId) => {
-    setSelectproductid(productId);
-    setCartPopup((prev) => (prev === productId ? null : productId));
-  };
-  const handleSizeSelect = (size) => {
-    setSelectedSize(size); // Size ko select karo
-    // Yahan setCartPopup(null) mat karo taake popup close na ho
-  };
-  const closePopup = () => {
-    setCartPopup(false);
-  };
+  // const handleSizeSelect = (productId, size) => {
+  //   setSelectedSizes((prev) => ({
+  //     ...prev,
+  //     [productId]: size, // Har product ka alag selected size store hoga
+  //   }));
+  //   setCartPopup(productId); // Popup open rakhne ke liye
+  //   alert(`Product added to cart successfully! Size: ${size}`);
+  // };
+
+  // const closePopup = () => {
+  //   setCartPopup(false);
+  // };
+
+  // useEffect(() => {
+  //   if (cartPopup) {
+  //     document.body.style.overflow = "hidden"; // Disable scroll
+  //   } else {
+  //     document.body.style.overflow = "auto"; // Restore scroll
+  //   }
+
+  //   return () => {
+  //     document.body.style.overflow = "auto"; // Cleanup on unmount
+  //   };
+  // }, [cartPopup]);
 
   return (
     <div className="DetailedProducts">
@@ -117,20 +128,19 @@ function DetailsDisplayProduct({ data, loading }) {
                 <div className="Productproductimage">
                   <img src={product.MainImage} alt="" />
                 </div>
-                <div
-                  className="CartButtonArea"
-                  onClick={(e) => {
-                    handleaddtocart(product._id);
-                    e.stopPropagation();
-                  }}
-                >
-                  {cartPopup !== product._id && (
-                    <div className="AddToCartIcon" title="Add to Cart">
-                      <GoPlus />
-                    </div>
-                  )}
-                  {cartPopup === product._id && (
-                    <div className="Size-Popup active">
+                <div className="CartButtonArea">
+                  <div
+                    className="AddToCartIcon"
+                    title="Add to Cart"
+                    onClick={() => handleNavigate(product)}
+                  >
+                    <GoPlus />
+                  </div>
+
+                  {/* {cartPopup === product._id && (
+
+                  )} */}
+                  {/* <div className="Size-Popup active">
                       <div className="Size-area">
                         {product.variations && product.variations.length > 0 ? (
                           product.variations
@@ -139,9 +149,13 @@ function DetailsDisplayProduct({ data, loading }) {
                               <button
                                 key={index}
                                 className={
-                                  selectedSize === size ? "selected" : ""
+                                  selectedSizes[product._id] === size
+                                    ? "selected"
+                                    : ""
                                 }
-                                onClick={() => handleSizeSelect(size)}
+                                onClick={() =>
+                                  handleSizeSelect(product._id, size)
+                                }
                               >
                                 {size}
                               </button>
@@ -150,8 +164,7 @@ function DetailsDisplayProduct({ data, loading }) {
                           <p>No sizes available</p>
                         )}
                       </div>
-                    </div>
-                  )}
+                    </div> */}
                 </div>
                 <div className="Detailed">
                   <div className="DetailedTitleandSVG">
