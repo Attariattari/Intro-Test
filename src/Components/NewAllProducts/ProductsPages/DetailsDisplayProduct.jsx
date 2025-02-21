@@ -222,12 +222,12 @@ function DetailsDisplayProduct({ data, loading }) {
                     )}
                   </div>
                   <div className="PriceSection space-x-3">
-                    {product.variations.map((variation, index) => (
-                      <React.Fragment key={index}>
-                        <span>PKR={variation.price.real}</span>
-                        <span>PKR={variation.price.discount}</span>
+                    {product.variations?.[0] && (
+                      <React.Fragment>
+                        <span>PKR={product.variations[0].price.real}</span>
+                        <span>PKR={product.variations[0].price.discount}</span>
                       </React.Fragment>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>

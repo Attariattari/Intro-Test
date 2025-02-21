@@ -461,7 +461,7 @@ export default function Home() {
                 src={groupedProducts[0]?.MainImage}
                 alt={groupedProducts[0]?.Name}
                 className="Swiper_Slider_Images"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }} // Single product, full width
+                style={{ width: "100%", height: "100%", objectFit: "contain" }} // Single product, full width
               />
               <h3 className="absolute bottom-3 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-md text-sm font-semibold">
                 {groupedProducts[0]?.csn || "No Name Available"}
