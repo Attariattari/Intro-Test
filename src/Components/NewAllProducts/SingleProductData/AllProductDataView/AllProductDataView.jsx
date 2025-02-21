@@ -101,7 +101,10 @@ function AllProductDataView({
               <span className="discount-price text-red-500 font-bold">
                 Rs. {activeVariation.price.discount}
               </span>
-              <span className="original-price line-through text-gray-500">
+              <span
+                className="original-price line-through"
+                style={{ color: "var(--text-color)" }}
+              >
                 Rs. {activeVariation.price.real}
               </span>
             </div>
