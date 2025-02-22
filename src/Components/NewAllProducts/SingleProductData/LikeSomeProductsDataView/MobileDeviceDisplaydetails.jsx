@@ -47,8 +47,6 @@ function MobileDeviceDisplaydetails({
       size: size || null, // ✅ Size parameter pass kiya
     };
 
-    console.log("🚀 Sending Data to API:", requestData);
-
     try {
       const response = await axios.post(
         "http://localhost:1122/CartProduct/add",
@@ -61,8 +59,6 @@ function MobileDeviceDisplaydetails({
           withCredentials: true,
         }
       );
-
-      console.log("✅ Response Data:", response?.data);
 
       if (response.status === 200 || response.status === 201) {
         Swal.fire({
@@ -242,8 +238,7 @@ function MobileDeviceDisplaydetails({
       </div>
       {/* {isexpanded && ( */}
       <div className="ExpendArea">
-        <p className="Womendiscription">{womenProducts[0].discription}</p>
-        <p className="Womencolor">{womenProducts[0].color}</p>
+        <p className="Womendiscription">{product.discription}</p>
         <div className="compoinmobile">
           <p>COMPOSITION & CARE</p>
           <p>COMPOSITION</p>
@@ -308,11 +303,10 @@ function MobileDeviceDisplaydetails({
           </div>
         </div>
         <div className="LikeSameWithProductData">
-          <LikeSameWithProductData />
+          <LikeSameWithProductData product={product} />
         </div>
         <Footer />
       </div>
-      {/* )} */}
 
       {ProductSizeBottom && (
         <span className="JustmobileSize p-0 text=[11px]">

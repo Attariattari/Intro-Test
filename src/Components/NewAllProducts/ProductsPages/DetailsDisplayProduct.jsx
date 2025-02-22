@@ -4,17 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { GoPlus } from "react-icons/go";
 import Footer from "../../Footer/Footer";
 import Spinner from "../../../Spinner";
-import axios from "axios";
-import { userContext } from "../../../Context/UserContext";
-import Swal from "sweetalert2";
 import { useWishlist } from "../../../Context/Wishlist";
 
 function DetailsDisplayProduct({ data, loading }) {
   const navigate = useNavigate();
-  const { token } = useContext(userContext);
-  // const [wishlistStatus, setWishlistStatus] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { wishlistStatus, checkProductInWishlist } = useWishlist();
+  const { setProductId, wishlistStatus, checkProductInWishlist, isLoading } =
+    useWishlist();
+
   useEffect(() => {
     if (data && data.length > 0) {
       data.forEach((product) => {
@@ -32,40 +28,6 @@ function DetailsDisplayProduct({ data, loading }) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const addToWishlist = async (productId) => {
-    setIsLoading(true); // Start loading for wishlist
-    window.scrollTo(0, 0);
-    try {
-      const response = await axios.post(
-        "http://localhost:1122/Wishlist/add",
-        { productId: productId },
-        {
-          headers: {
-            Authenticate: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Product added to wishlist successfully!",
-        });
-      }
-    } catch (error) {
-      console.error("Error adding product to wishlist:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Failed",
-        text: "Failed to add product to wishlist. Please try again.",
-      });
-    } finally {
-      setIsLoading(false); // Stop loading for wishlist
-    }
-  };
 
   const handleNavigate = (product) => {
     navigate(`/SingleProduct/${product.Name}/${product._id}`);
@@ -145,7 +107,7 @@ function DetailsDisplayProduct({ data, loading }) {
                         stroke="inherit"
                         onClick={(e) => {
                           e.stopPropagation();
-                          addToWishlist(product._id);
+                          setProductId(product._id);
                         }}
                       >
                         <title>Add to Wishlist</title>{" "}

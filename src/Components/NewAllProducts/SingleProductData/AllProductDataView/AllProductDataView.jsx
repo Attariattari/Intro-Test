@@ -3,18 +3,17 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import SHIPPING_AND_RETURNS from "../../Offcanvice/SHIPPING_AND_RETURNS";
 import "../SingleProduct.css";
-import { userContext } from "../../../../Context/UserContext";
-import axios from "axios";
 import Spinner from "../../../../Spinner";
 import { useWishlist } from "../../../../Context/Wishlist";
+import { useCart } from "../../../../Context/CartContext";
 
 function AllProductDataView({ product, activeVariation, setActiveVariation }) {
-  const [drawerType, setDrawerType] = useState(null); // State to manage which drawer is open
+  const [drawerType, setDrawerType] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
-  const { token } = useContext(userContext);
-  const { wishlistStatus, checkProductInWishlist } = useWishlist();
+  const { addToCart, Loading } = useCart();
+  const { setProductId, wishlistStatus, checkProductInWishlist, isLoading } =
+    useWishlist();
 
-  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (product?._id) {
       checkProductInWishlist(product._id); // ✅ Auto-check on component mount
@@ -35,93 +34,60 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
     };
   }, [drawerType]);
 
-  const addtocart = async () => {
-    setIsLoading(true);
-    window.scrollTo(0, 0);
-    const requestData = {
-      product: product?._id, // ✅ Correct key names as per API
-      variationId: activeVariation?._id,
-      size: selectedSize || null,
-    };
-    console.log("🚀 Sending Data to API:", requestData); // ✅ Debugging
-    try {
-      const response = await axios.post(
-        "http://localhost:1122/CartProduct/add",
-        requestData, // ✅ Data sent in body correctly
-        {
-          headers: {
-            Authenticate: `Bearer ${token}`,
-            "Content-Type": "application/json", // ✅ Ensure JSON format
-          },
-          withCredentials: true,
-        }
-      );
-      console.log("✅ Response Data:", response?.data); // ✅ Debugging
-      if (response.status === 200 || response.status === 201) {
-        Swal.fire({
-          icon: "success",
-          title: "🛍️ Success!",
-          text: "Product added to cart successfully!",
-          // timer: 5000,
-          showConfirmButton: true,
-        });
-        // ✅ Drawer Open After Success
-        openDrawer("AddToCart");
-      } else {
-        console.log("❌ Response Status:", response.status);
-        Swal.fire({
-          icon: "error",
-          title: "❌ Failed",
-          text: "Something went wrong! Try again.",
-          timer: 5000,
-          showConfirmButton: true,
-        });
-      }
-    } catch (error) {
-      console.error("🚨 Error adding product to cart:", error);
-      Swal.fire({
-        icon: "error",
-        title: "❌ Error",
-        text: "Unable to add product. Try again!",
-      });
-    } finally {
-      setIsLoading(false);
-      console.log("🔄 Loading Stopped");
-    }
-  };
-
-  const addToWishlist = async (productId) => {
-    setIsLoading(true);
-    window.scrollTo(0, 0);
-    try {
-      const response = await axios.post(
-        "http://localhost:1122/Wishlist/add",
-        { productId },
-        {
-          headers: { Authenticate: `Bearer ${token}` },
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        // updateWishlistStatus(productId, true);
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Product added to wishlist successfully!",
-        });
-      }
-    } catch (error) {
-      console.error("Error adding product to wishlist:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Failed",
-        text: "Failed to add product to wishlist. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const addtocart = async () => {
+  //   setIsLoading(true);
+  //   window.scrollTo(0, 0);
+  //   const requestData = {
+  //     product: product?._id, // ✅ Correct key names as per API
+  //     variationId: activeVariation?._id,
+  //     size: selectedSize || null,
+  //   };
+  //   console.log("🚀 Sending Data to API:", requestData); // ✅ Debugging
+  //   try {
+  //     const response = await axios.post(
+  //       "http://localhost:1122/CartProduct/add",
+  //       requestData, // ✅ Data sent in body correctly
+  //       {
+  //         headers: {
+  //           Authenticate: `Bearer ${token}`,
+  //           "Content-Type": "application/json", // ✅ Ensure JSON format
+  //         },
+  //         withCredentials: true,
+  //       }
+  //     );
+  //     console.log("✅ Response Data:", response?.data); // ✅ Debugging
+  //     if (response.status === 200 || response.status === 201) {
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: "🛍️ Success!",
+  //         text: "Product added to cart successfully!",
+  //         // timer: 5000,
+  //         showConfirmButton: true,
+  //       });
+  //       // ✅ Drawer Open After Success
+  //       openDrawer("AddToCart");
+  //     } else {
+  //       console.log("❌ Response Status:", response.status);
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "❌ Failed",
+  //         text: "Something went wrong! Try again.",
+  //         timer: 5000,
+  //         showConfirmButton: true,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("🚨 Error adding product to cart:", error);
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "❌ Error",
+  //       text: "Unable to add product. Try again!",
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //     console.log("🔄 Loading Stopped");
+  //   }
+  // };
 
   const openDrawer = (drawer) => {
     setDrawerType(drawer);
@@ -133,7 +99,7 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
   };
 
   const handleSizeSelect = (size) => {
-    setSelectedSize(size, () => {});
+    setSelectedSize((prevSize) => (prevSize === size ? null : size));
   };
 
   const showErrorModal = () => {
@@ -166,6 +132,12 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
 
   return (
     <div>
+      {Loading && (
+        <div className="cart-spinner">
+          <Spinner />
+        </div>
+      )}
+
       {isLoading && (
         <div className="cart-spinner">
           <Spinner />
@@ -209,7 +181,7 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
               stroke="inherit"
               onClick={(e) => {
                 e.stopPropagation();
-                addToWishlist(product?._id);
+                setProductId(product?._id);
               }}
             >
               <title>Add to Wishlist</title>
@@ -330,13 +302,8 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
             showErrorModal();
             return;
           }
-
-          setIsLoading(true); // ✅ Spinner Show
-          try {
-            await addtocart(); // ✅ API Call
-          } finally {
-            setIsLoading(false); // ✅ Spinner Hide
-          }
+          await addToCart(product, activeVariation, selectedSize); // ✅ API Call
+          setSelectedSize(null); // ✅ Reset size after adding to cart
         }}
       >
         ADD TO CART

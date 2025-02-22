@@ -11,12 +11,10 @@ import MobileDeviceDisplaydetails from "./LikeSomeProductsDataView/MobileDeviceD
 import LikeSameWithProductData from "./LikeSomeProductsDataView/LikeSameWithProductData";
 import AllProductDataView from "./AllProductDataView/AllProductDataView";
 import Composetion from "./CompositionArea/Composetion";
-import { ZaraProducts } from "../../DummyData/Data";
 import axios from "axios";
 import Spinner from "../../../Spinner.jsx";
 
 function SingleProduct() {
-  const womenProduct = [ZaraProducts.Women.SATINY_BLAZER];
   const [isexpanded, setIsexpanded] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -31,22 +29,29 @@ function SingleProduct() {
     activeSlide: 0,
     showSidePopup: false,
     showMobileDisplay: true,
+    error: null,
   });
-  const fetchproduct = async () => {
-    setState((prevState) => ({ ...prevState, loading: true }));
+
+  const fetchProduct = async () => {
+    if (!id) return; // If ID is not present, don't fetch data
+
+    setState((prevState) => ({ ...prevState, loading: true, error: null }));
+
     try {
       const response = await axios.get(`http://localhost:1122/Product/${id}`);
       const data = response.data;
-      setState({ data, loading: false });
+
+      setState({ data, loading: false, error: null });
     } catch (error) {
-      console.error("Error fetching data: ", error);
-      setState({ data: null, loading: false });
+      console.error("Error fetching data:", error);
+
+      setState({ data: null, loading: false, error: error.message });
     }
   };
 
   useEffect(() => {
-    fetchproduct();
-  }, []);
+    fetchProduct();
+  }, [id]); // Runs every time ID changes
   const [activeVariation, setActiveVariation] = useState(
     state.data?.variations?.[0] || null
   );
@@ -243,7 +248,6 @@ function SingleProduct() {
               product={state.data}
               activeVariation={activeVariation}
               setActiveVariation={handleVariationChange} // ✅ Yeh function props se jayega
-              womenProducts={womenProduct}
               variationInfo={{
                 productId: state.data?._id,
                 variationId: activeVariation?._id,
@@ -279,7 +283,6 @@ function SingleProduct() {
             product={state.data}
             activeVariation={activeVariation}
             setActiveVariation={handleVariationChange} // ✅ Yeh function props se jayega
-            womenProducts={womenProduct}
             variationInfo={{
               productId: state.data?._id,
               product: state.data,
@@ -291,7 +294,7 @@ function SingleProduct() {
         </div>
       )}
       <div className="LikeSameWithProductData LikeProduct">
-        <LikeSameWithProductData />
+        <LikeSameWithProductData product={state.data} />
       </div>
       <span className="One">
         <Footer />

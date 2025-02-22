@@ -7,8 +7,6 @@ import { GoPlus } from "react-icons/go";
 import Cartpopup from "./Cartpopup";
 
 function SmallDisplayProducts({ data, loading }) {
-  const [cartPopup, setCartPopup] = useState(false);
-  const [selectproductid, setSelectproductid] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,26 +16,6 @@ function SmallDisplayProducts({ data, loading }) {
   const handleNavigate = (product) => {
     navigate(`/SingleProduct/${product.Name}/${product._id}`);
   };
-
-  const handleaddtocart = (productId) => {
-    setSelectproductid(productId);
-    setCartPopup(true);
-  };
-
-  const closePopup = () => {
-    setCartPopup(false); // Hide popup
-  };
-
-  useEffect(() => {
-    if (cartPopup) {
-      document.body.style.overflow = "hidden"; // Disable scroll
-    } else {
-      document.body.style.overflow = "auto"; // Restore scroll
-    }
-    return () => {
-      document.body.style.overflow = "auto"; // Cleanup on unmount
-    };
-  }, [cartPopup]);
 
   return (
     <div className="product-grid-container">
