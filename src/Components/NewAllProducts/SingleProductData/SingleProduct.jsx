@@ -48,29 +48,31 @@ function SingleProduct() {
   useEffect(() => {
     fetchproduct();
   }, []);
-  const [activeVariation, setActiveVariation] = useState(null);
-  const [displayImages, setDisplayImages] = useState([]);
+  const [activeVariation, setActiveVariation] = useState(
+    state.data?.variations?.[0] || null
+  );
+  const [displayImages, setDisplayImages] = useState(
+    state.data?.variations?.[0]
+      ? [state.data.MainImage, ...state.data.variations[0].image]
+      : []
+  );
 
   useEffect(() => {
-    if (
-      state.data &&
-      state.data.variations &&
-      state.data.variations.length > 0
-    ) {
-      const firstVariation = state.data.variations[0];
-      setActiveVariation(firstVariation);
-
-      // ✅ Default state me "Main Image + First Variation Images"
-      setDisplayImages([state.data.MainImage, ...firstVariation.image]);
+    if (activeVariation) {
+      if (state.data?.variations?.[0]?._id === activeVariation._id) {
+        // ✅ Agar first variation select ho rahi hai, to Main Image bhi dikhani hai
+        setDisplayImages([state.data.MainImage, ...activeVariation.image]);
+      } else {
+        // ✅ Agar koi aur variation hai, to sirf uski apni images dikhani hain
+        setDisplayImages([...activeVariation.image]);
+      }
     }
-  }, [state.data]);
+  }, [activeVariation]);
 
   const handleVariationChange = (variation) => {
     setActiveVariation(variation);
     setDisplayImages(variation.image); // ✅ Sirf is variation ki images
   };
-  const womenProducts = activeVariation ? [activeVariation] : [];
-  console.log("Active Variation:", activeVariation);
 
   const swiperRef = useRef(null);
 
@@ -88,6 +90,30 @@ function SingleProduct() {
       swiperRef.current.swiper.slideTo(index);
     }
   };
+  useEffect(() => {
+    if (state.data?.variations?.length > 0) {
+      const firstVariation = state.data.variations[0];
+
+      // ✅ Pehli dafa ya refresh par first variation select ho
+      if (!activeVariation) {
+        setActiveVariation(firstVariation);
+        setDisplayImages([state.data.MainImage, ...firstVariation.image]);
+      } else {
+        // ✅ Agar user koi variation select kare to uski images show ho
+        if (state.data.variations[0]._id === activeVariation._id) {
+          setDisplayImages([state.data.MainImage, ...activeVariation.image]);
+        } else {
+          setDisplayImages([...activeVariation.image]);
+        }
+      }
+
+      // ✅ Har variation change hone par slider first image se start ho
+      setActiveSlide(0);
+      if (swiperRef.current && swiperRef.current.swiper) {
+        swiperRef.current.swiper.slideTo(0);
+      }
+    }
+  }, [activeVariation, state.data]);
 
   const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
@@ -180,9 +206,7 @@ function SingleProduct() {
               {displayImages.map((imageUrl, index) => (
                 <SwiperSlide key={index}>
                   <div className="ImagesCarosual">
-                    <div className="imageWrapper">
-                      <img src={imageUrl} alt={`Variation ${index}`} />
-                    </div>
+                    <img src={imageUrl} alt={`Variation ${index}`} />
                   </div>
                 </SwiperSlide>
               ))}
@@ -207,7 +231,7 @@ function SingleProduct() {
             <AllProductDataView
               product={state.data}
               activeVariation={activeVariation}
-              setActiveVariation={setActiveVariation} // ✅ Ab ye bhi pass ho raha hai
+              setActiveVariation={handleVariationChange} // ✅ Yeh function props se jayega
               womenProducts={womenProduct}
             />
           </div>
@@ -238,6 +262,8 @@ function SingleProduct() {
           </div>
           <MobileDeviceDisplaydetails
             womenProducts={womenProduct}
+            product={state.data}
+            activeVariation={activeVariation}
             isexpanded={isexpanded}
             toggleIsexpanded={toggleIsexpanded}
           />

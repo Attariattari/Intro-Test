@@ -6,8 +6,15 @@ import "../SingleProduct.css";
 import { Drawer } from "@material-tailwind/react";
 import SHIPPING_AND_RETURNS from "../../Offcanvice/SHIPPING_AND_RETURNS";
 import LikeSomeproducts from "./LikeSomeproducts";
+import { TbBleachOff, TbWashDrycleanOff, TbWashOff } from "react-icons/tb";
+import { MdOutlineIron } from "react-icons/md";
+import { CiCircleInfo } from "react-icons/ci";
 
-function MobileDeviceDisplaydetails({ womenProducts }) {
+function MobileDeviceDisplaydetails({
+  womenProducts,
+  activeVariation,
+  product,
+}) {
   const [ProductSizeBottom, setProductSizeBottom] = useState(false);
   const [Successaddtocart, setSuccessaddtocart] = useState(false);
   const [MEASUREPENS, setMEASUREPENS] = useState(false);
@@ -43,17 +50,37 @@ function MobileDeviceDisplaydetails({ womenProducts }) {
   const toggleWishlist = () => {
     setIsInWishlist((prev) => !prev);
   };
-  
+
   return (
     <div ref={mobileDisplayRef}>
       <div className="NoExpendArea">
         <div className="NoExpendArea_Title">
-          <p>{womenProducts[0].title}</p>
-          <p className="WomenRealPRice">{womenProducts[0].price.RealPrice}</p>
+          <p>{product.Name.substring(0, 32)}</p>
+          <p className="price">
+            {activeVariation?.price?.discount > 0 &&
+            activeVariation?.price?.discount !==
+              activeVariation?.price?.real ? (
+              <div className="price flex gap-2">
+                <span className="discount-price text-red-500 font-bold">
+                  Rs. {activeVariation.price.discount}
+                </span>
+                <span
+                  className="original-price line-through"
+                  style={{ color: "var(--text-color)" }}
+                >
+                  Rs. {activeVariation.price.real}
+                </span>
+              </div>
+            ) : (
+              <span className="original-price font-bold">
+                Rs. {activeVariation?.price?.real}
+              </span>
+            )}
+          </p>
         </div>
         <div className="NoExpendArea_Buttons">
           <button
-            className="sticky top-0 z-10 bg-white NoExpendArea_Add"
+            className="sticky top-0 z-10 bg-[var(--bg-color)] text-[var(--text-color)] NoExpendArea_Add"
             onClick={(e) => {
               e.preventDefault();
               openDrawers("SizeDrawer");
@@ -63,18 +90,17 @@ function MobileDeviceDisplaydetails({ womenProducts }) {
             ADD
           </button>
           <button
-            className="sticky top-0 z-10 bg-white NoExpendArea_Wishlist"
+            className="sticky top-0 z-10 bg-[var(--bg-color)] NoExpendArea_Wishlist"
             onClick={toggleWishlist}
           >
             {isInWishlist ? (
               <svg
-                className="wishlist-icon wishlist-icon--productDetail"
                 preserveAspectRatio="xMidYMid slice"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-                fill="inherit"
+                fill="var(--text-color)"
                 stroke="inherit"
               >
                 <path
@@ -91,7 +117,7 @@ function MobileDeviceDisplaydetails({ womenProducts }) {
                 height="24"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-                fill="inherit"
+                fill="var(--text-color)"
                 stroke="inherit"
               >
                 <path
@@ -151,43 +177,23 @@ function MobileDeviceDisplaydetails({ womenProducts }) {
           </p>
           <Link className="underline">Clothing Care Guided</Link>
           <div className="space-x-5">
-            <img
-              src="https://static.zara.net/photos///contents/cm/product-cares-9-icon_0.svg?ts=1604343299129"
-              alt=""
-              width="20"
-            />
+            <TbWashOff style={{ width: "60px", height: "20px" }} />
             <p>Do not wash</p>
           </div>
           <div className="space-x-5">
-            <img
-              src="https://static.zara.net/photos///contents/cm/product-cares-14-icon_0.svg?ts=1604343289322"
-              alt=""
-              width="20"
-            />
+            <TbBleachOff style={{ width: "60px", height: "20px" }} />
             <p>Do not use bleach</p>
           </div>
           <div className="space-x-5">
-            <img
-              src="https://static.zara.net/photos///contents/cm/product-cares-18-icon_0.svg?ts=1604343283533"
-              alt=""
-              width="20"
-            />
+            <MdOutlineIron style={{ width: "60px", height: "20px" }} />
             <p>Iron at a maximum of 110ºC/230ºF</p>
           </div>
           <div className="space-x-5">
-            <img
-              src="https://static.zara.net/photos///contents/cm/product-cares-125-icon_0.svg?ts=1604671818114"
-              alt=""
-              width="20"
-            />
+            <CiCircleInfo style={{ width: "60px", height: "20px" }} />
             <p>Dry clean with tetrachloroethylene</p>
           </div>
           <div className="space-x-5">
-            <img
-              src="https://static.zara.net/photos///contents/cm/product-cares-35-icon_0.svg?ts=1604343281266"
-              alt=""
-              width="20"
-            />
+            <TbWashDrycleanOff style={{ width: "60px", height: "20px" }} />
             <p>Do not tumble dry</p>
           </div>
         </div>

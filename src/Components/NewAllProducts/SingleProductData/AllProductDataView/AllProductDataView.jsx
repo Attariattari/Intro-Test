@@ -4,12 +4,7 @@ import Swal from "sweetalert2";
 import SHIPPING_AND_RETURNS from "../../Offcanvice/SHIPPING_AND_RETURNS";
 import "../SingleProduct.css";
 
-function AllProductDataView({
-  womenProducts,
-  product,
-  activeVariation,
-  setActiveVariation,
-}) {
+function AllProductDataView({ product, activeVariation, setActiveVariation }) {
   const [drawerType, setDrawerType] = useState(null); // State to manage which drawer is open
   const [selectedSize, setSelectedSize] = useState(null);
   const [error, setError] = useState(false);
@@ -71,6 +66,9 @@ function AllProductDataView({
       }
     });
   };
+  const handleColorClick = (variation) => {
+    setActiveVariation(variation); // ✅ Yeh parent me state update karega
+  };
 
   return (
     <div>
@@ -116,8 +114,9 @@ function AllProductDataView({
         </p>
 
         <p>
-          {product.Description}
-          {womenProducts[0].discription}
+          {product.Description.length > 180
+            ? `${product.Description.substring(0, 180)}...`
+            : product.Description}
         </p>
         <Link
           onClick={(e) => {
@@ -144,14 +143,32 @@ function AllProductDataView({
           {product?.variations?.map((variation, index) => (
             <span
               key={index}
-              className={`color-box  cursor-pointer ${
-                activeVariation?.color?.name === variation?.color?.name
-                  ? "active"
-                  : ""
-              }`}
-              style={{ backgroundColor: variation?.color?.code }}
-              onClick={() => setActiveVariation(variation)}
-            />
+              className={`color-box cursor-pointer transition-all duration-300 relative
+      ${
+        activeVariation?.color?.name === variation?.color?.name
+          ? "active scale-110"
+          : ""
+      }
+    `}
+              style={{
+                backgroundColor: variation?.color?.code,
+                pointerEvents:
+                  activeVariation?.color?.name === variation?.color?.name
+                    ? "none"
+                    : "auto",
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)", // Shadow effect for better visibility
+              }}
+              onClick={() => handleColorClick(variation)}
+              title={variation?.color?.name}
+            >
+              {/* ✅ Active Indicator Animation */}
+              {activeVariation?.color?.name === variation?.color?.name && (
+                <span className="absolute inset-0 border-2 border-white rounded-full animate-pulse" />
+              )}
+
+              {/* ✅ Hover Effect */}
+              <span className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 bg-white/20 rounded-full" />
+            </span>
           ))}
         </div>
         <span className="product-sizes p-0 mb-[06px]">
