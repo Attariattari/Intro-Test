@@ -38,7 +38,6 @@ function SingleProduct() {
       const response = await axios.get(`http://localhost:1122/Product/${id}`);
       const data = response.data;
       setState({ data, loading: false });
-      console.log(data);
     } catch (error) {
       console.error("Error fetching data: ", error);
       setState({ data: null, loading: false });
@@ -71,13 +70,14 @@ function SingleProduct() {
 
   const handleVariationChange = (variation) => {
     setActiveVariation(variation);
-    setDisplayImages(variation.image); // ✅ Sirf is variation ki images
+    setDisplayImages(variation.image);
   };
 
   const swiperRef = useRef(null);
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
+    window.scrollTo(0, 0);
   };
 
   const toggleIsexpanded = () => {
@@ -90,6 +90,7 @@ function SingleProduct() {
       swiperRef.current.swiper.slideTo(index);
     }
   };
+
   useEffect(() => {
     if (state.data?.variations?.length > 0) {
       const firstVariation = state.data.variations[0];
@@ -158,8 +159,18 @@ function SingleProduct() {
     toggleIsexpanded();
   };
 
-  if (state.loading) return <Spinner />;
-  if (!state.data) return <p>No Product Found</p>;
+  if (state.loading)
+    return (
+      <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center bg-white/10 backdrop-blur-xl">
+        <Spinner />
+      </div>
+    );
+  if (!state.data)
+    return (
+      <p className="w-full h-full absolute top-0 left-0 flex items-center justify-center bg-white/10 backdrop-blur-xl">
+        No Product Found
+      </p>
+    );
 
   return (
     <div>
@@ -233,6 +244,10 @@ function SingleProduct() {
               activeVariation={activeVariation}
               setActiveVariation={handleVariationChange} // ✅ Yeh function props se jayega
               womenProducts={womenProduct}
+              variationInfo={{
+                productId: state.data?._id,
+                variationId: activeVariation?._id,
+              }}
             />
           </div>
         </div>
@@ -261,9 +276,15 @@ function SingleProduct() {
             </div>
           </div>
           <MobileDeviceDisplaydetails
-            womenProducts={womenProduct}
             product={state.data}
             activeVariation={activeVariation}
+            setActiveVariation={handleVariationChange} // ✅ Yeh function props se jayega
+            womenProducts={womenProduct}
+            variationInfo={{
+              productId: state.data?._id,
+              product: state.data,
+              variationId: activeVariation?._id,
+            }}
             isexpanded={isexpanded}
             toggleIsexpanded={toggleIsexpanded}
           />

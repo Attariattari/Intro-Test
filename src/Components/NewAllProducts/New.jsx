@@ -15,7 +15,6 @@ function New() {
     localStorage.getItem("selectedComponent") || "DetailsDisplay"
   );
   const { cid, csid } = useParams();
-  console.log("cid", cid, "csid", csid);
   const [isScrolled, setIsScrolled] = useState(false);
   const [state, setState] = useState({
     data: [],

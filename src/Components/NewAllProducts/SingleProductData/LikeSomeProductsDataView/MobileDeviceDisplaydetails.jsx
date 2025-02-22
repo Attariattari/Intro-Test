@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LikeSameWithProductData from "./LikeSameWithProductData";
 import Footer from "../../../Footer/Footer";
@@ -9,30 +9,99 @@ import LikeSomeproducts from "./LikeSomeproducts";
 import { TbBleachOff, TbWashDrycleanOff, TbWashOff } from "react-icons/tb";
 import { MdOutlineIron } from "react-icons/md";
 import { CiCircleInfo } from "react-icons/ci";
+import Swal from "sweetalert2";
+import { userContext } from "../../../../Context/UserContext";
+import axios from "axios";
+import Spinner from "../../../../Spinner";
 
 function MobileDeviceDisplaydetails({
   womenProducts,
   activeVariation,
   product,
+  setActiveVariation,
 }) {
   const [ProductSizeBottom, setProductSizeBottom] = useState(false);
   const [Successaddtocart, setSuccessaddtocart] = useState(false);
   const [MEASUREPENS, setMEASUREPENS] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const mobileDisplayRef = useRef(null);
   const Navigate = useNavigate();
-
-  const closedrawers = () => {
-    setProductSizeBottom(false);
-    setSuccessaddtocart(false);
-  };
+  const { token } = useContext(userContext);
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
     setProductSizeBottom(false); // Close the product size button
-    setSuccessaddtocart(true); // Show the success cart
     setSelectedSize(null); // Reset the selected size
+    addtocart(size); // ✅ Size select hote hi cart me add hoga
+  };
+
+  const addtocart = async (size) => {
+    setIsLoading(true);
+    window.scrollTo(0, 0);
+
+    const requestData = {
+      product: product?._id,
+      variationId: activeVariation?._id,
+      size: size || null, // ✅ Size parameter pass kiya
+    };
+
+    console.log("🚀 Sending Data to API:", requestData);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:1122/CartProduct/add",
+        requestData,
+        {
+          headers: {
+            Authenticate: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log("✅ Response Data:", response?.data);
+
+      if (response.status === 200 || response.status === 201) {
+        Swal.fire({
+          icon: "success",
+          title: "🛍️ Success!",
+          text: "Product added to cart successfully!",
+          showConfirmButton: true,
+          timer: 5000,
+        }).then(() => {
+          openDrawers("AddtocartSucces");
+        });
+        setProductSizeBottom(false);
+        setSuccessaddtocart(true);
+      } else {
+        console.log("❌ Response Status:", response.status);
+        Swal.fire({
+          icon: "error",
+          title: "❌ Failed",
+          text: "Something went wrong! Try again.",
+          showConfirmButton: true,
+          timer: 5000,
+        });
+      }
+    } catch (error) {
+      console.error("🚨 Error adding product to cart:", error);
+      Swal.fire({
+        icon: "error",
+        title: "❌ Error",
+        text: "Unable to add product. Try again!",
+      });
+    } finally {
+      setIsLoading(false);
+      console.log("🔄 Loading Stopped");
+    }
+  };
+
+  const closedrawers = () => {
+    setProductSizeBottom(false);
+    setSuccessaddtocart(false);
   };
 
   const openDrawers = (drawerType) => {
@@ -50,33 +119,74 @@ function MobileDeviceDisplaydetails({
   const toggleWishlist = () => {
     setIsInWishlist((prev) => !prev);
   };
-
+  const handleColorClick = (variation) => {
+    setActiveVariation(variation); // ✅ Yeh parent me state update karega
+  };
   return (
     <div ref={mobileDisplayRef}>
+      {isLoading && (
+        <div className="cart-spinner">
+          <Spinner />
+        </div>
+      )}
       <div className="NoExpendArea">
         <div className="NoExpendArea_Title">
-          <p>{product.Name.substring(0, 32)}</p>
-          <p className="price">
-            {activeVariation?.price?.discount > 0 &&
-            activeVariation?.price?.discount !==
-              activeVariation?.price?.real ? (
-              <div className="price flex gap-2">
-                <span className="discount-price text-red-500 font-bold">
-                  Rs. {activeVariation.price.discount}
+          <div>
+            <p>{product.Name.substring(0, 32)}</p>
+            <p className="price">
+              {activeVariation?.price?.discount > 0 &&
+              activeVariation?.price?.discount !==
+                activeVariation?.price?.real ? (
+                <div className="price flex gap-2">
+                  <span className="discount-price text-red-500 font-bold">
+                    Rs. {activeVariation.price.discount}
+                  </span>
+                  <span
+                    className="original-price line-through"
+                    style={{ color: "var(--text-color)" }}
+                  >
+                    Rs. {activeVariation.price.real}
+                  </span>
+                </div>
+              ) : (
+                <span className="original-price font-bold">
+                  Rs. {activeVariation?.price?.real}
                 </span>
-                <span
-                  className="original-price line-through"
-                  style={{ color: "var(--text-color)" }}
-                >
-                  Rs. {activeVariation.price.real}
-                </span>
-              </div>
-            ) : (
-              <span className="original-price font-bold">
-                Rs. {activeVariation?.price?.real}
+              )}
+            </p>
+          </div>
+          <div className="Colors">
+            {product?.variations?.map((variation, index) => (
+              <span
+                key={index}
+                className={`color-box cursor-pointer transition-all duration-300 relative
+                ${
+                  activeVariation?.color?.name === variation?.color?.name
+                    ? "active scale-110"
+                    : ""
+                }
+              `}
+                style={{
+                  backgroundColor: variation?.color?.code,
+                  pointerEvents:
+                    activeVariation?.color?.name === variation?.color?.name
+                      ? "none"
+                      : "auto",
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)", // Shadow effect for better visibility
+                }}
+                onClick={() => handleColorClick(variation)}
+                title={variation?.color?.name}
+              >
+                {/* ✅ Active Indicator Animation */}
+                {activeVariation?.color?.name === variation?.color?.name && (
+                  <span className="absolute inset-0 border-2 border-white rounded-full animate-pulse" />
+                )}
+
+                {/* ✅ Hover Effect */}
+                <span className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 bg-white/20 rounded-full" />
               </span>
-            )}
-          </p>
+            ))}
+          </div>
         </div>
         <div className="NoExpendArea_Buttons">
           <button
@@ -211,7 +321,7 @@ function MobileDeviceDisplaydetails({
             open={ProductSizeBottom}
             size={360}
             onClose={closedrawers}
-            className="BottomDraver p-0"
+            className="BottomDraver p-0 bg-[var(--bg-color)]"
           >
             <div className="DrawerSizeData">
               <div className="Drawer_Size_Title">
@@ -219,10 +329,10 @@ function MobileDeviceDisplaydetails({
                 <div>This product is longer than usual.</div>
               </div>
               <div className="Drawer_Size_Data" style={{ fontSize: "11px" }}>
-                {womenProducts[0].size.map((size, index) => (
+                {activeVariation?.size?.map((size, index) => (
                   <button
                     key={index}
-                    className={selectedSize === size ? "Size" : ""}
+                    className={selectedSize === size ? "Size selected" : ""}
                     onClick={() => handleSizeSelect(size)}
                   >
                     {size}
@@ -278,21 +388,3 @@ function MobileDeviceDisplaydetails({
 }
 
 export default MobileDeviceDisplaydetails;
-
-// const handleDragStart = (e) => {
-//   const clientY = e.clientY || (e.touches && e.touches[0].clientY); // Handle touch events
-//   setInitialY(clientY);
-//   if (isexpanded) {
-//     toggleIsexpanded();
-//   }
-// };
-
-// const handleDragEnd = (e) => {
-//   const clientY =
-//     e.clientY || (e.changedTouches && e.changedTouches[0].clientY); // Handle touch events
-//   const deltaY = clientY - initialY;
-//   if (deltaY < 0) {
-//     toggleIsexpanded();
-//   }
-//   setInitialY(null);
-// };

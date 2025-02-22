@@ -7,34 +7,31 @@ import Spinner from "../../../Spinner";
 import axios from "axios";
 import { userContext } from "../../../Context/UserContext";
 import Swal from "sweetalert2";
-import Cartpopup from "./Cartpopup";
+import { useWishlist } from "../../../Context/Wishlist";
 
 function DetailsDisplayProduct({ data, loading }) {
   const navigate = useNavigate();
   const { token } = useContext(userContext);
-  const [wishlistStatus, setWishlistStatus] = useState([]);
+  // const [wishlistStatus, setWishlistStatus] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { wishlistStatus, checkProductInWishlist } = useWishlist();
+  useEffect(() => {
+    if (data && data.length > 0) {
+      data.forEach((product) => {
+        if (product._id) {
+          console.log(
+            `Checking wishlist status for Product ID: ${product._id}`
+          ); // ✅ Console log
+          checkProductInWishlist(product._id); // ✅ Auto-check for each product
+        } else {
+          console.warn("Product ID missing:", product); // ❌ Warn if product ID is missing
+        }
+      });
+    }
+  }, [data]);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  useEffect(() => {
-    const initialWishlistStatus = data.map((product) => ({
-      productId: product._id,
-      isInWishlist: product.isInWishlist,
-    }));
-
-    setWishlistStatus(initialWishlistStatus);
-  }, [data]);
-  const updateWishlistStatus = (productId, status) => {
-    setWishlistStatus((prevState) =>
-      prevState.map((product) =>
-        product.productId === productId
-          ? { ...product, isInWishlist: status }
-          : product
-      )
-    );
-  };
 
   const addToWishlist = async (productId) => {
     setIsLoading(true); // Start loading for wishlist
@@ -52,7 +49,6 @@ function DetailsDisplayProduct({ data, loading }) {
       );
 
       if (response.status === 200) {
-        updateWishlistStatus(productId, true); // Update local state
         Swal.fire({
           icon: "success",
           title: "Success",
@@ -75,31 +71,6 @@ function DetailsDisplayProduct({ data, loading }) {
     navigate(`/SingleProduct/${product.Name}/${product._id}`);
   };
 
-  // const handleSizeSelect = (productId, size) => {
-  //   setSelectedSizes((prev) => ({
-  //     ...prev,
-  //     [productId]: size, // Har product ka alag selected size store hoga
-  //   }));
-  //   setCartPopup(productId); // Popup open rakhne ke liye
-  //   alert(`Product added to cart successfully! Size: ${size}`);
-  // };
-
-  // const closePopup = () => {
-  //   setCartPopup(false);
-  // };
-
-  // useEffect(() => {
-  //   if (cartPopup) {
-  //     document.body.style.overflow = "hidden"; // Disable scroll
-  //   } else {
-  //     document.body.style.overflow = "auto"; // Restore scroll
-  //   }
-
-  //   return () => {
-  //     document.body.style.overflow = "auto"; // Cleanup on unmount
-  //   };
-  // }, [cartPopup]);
-
   return (
     <div className="DetailedProducts">
       {loading && (
@@ -114,10 +85,6 @@ function DetailsDisplayProduct({ data, loading }) {
       ) : (
         <div className="ProductArea cursor-pointer">
           {data.map((product, index) => {
-            const isInWishlist = wishlistStatus.find(
-              (status) => status.productId === product._id
-            )?.isInWishlist;
-
             return (
               <div
                 className="ProductGridView"
@@ -136,35 +103,6 @@ function DetailsDisplayProduct({ data, loading }) {
                   >
                     <GoPlus />
                   </div>
-
-                  {/* {cartPopup === product._id && (
-
-                  )} */}
-                  {/* <div className="Size-Popup active">
-                      <div className="Size-area">
-                        {product.variations && product.variations.length > 0 ? (
-                          product.variations
-                            .flatMap((variation) => variation.size)
-                            .map((size, index) => (
-                              <button
-                                key={index}
-                                className={
-                                  selectedSizes[product._id] === size
-                                    ? "selected"
-                                    : ""
-                                }
-                                onClick={() =>
-                                  handleSizeSelect(product._id, size)
-                                }
-                              >
-                                {size}
-                              </button>
-                            ))
-                        ) : (
-                          <p>No sizes available</p>
-                        )}
-                      </div>
-                    </div> */}
                 </div>
                 <div className="Detailed">
                   <div className="DetailedTitleandSVG">
@@ -173,7 +111,7 @@ function DetailsDisplayProduct({ data, loading }) {
                         ? `${product.Name.substring(0, 24)}...`
                         : product.Name}
                     </h4>
-                    {isInWishlist ? (
+                    {wishlistStatus[product._id] ? (
                       <svg
                         className="wishlist-icon wishlist-icon--productDetail"
                         preserveAspectRatio="xMidYMid slice"
@@ -189,7 +127,6 @@ function DetailsDisplayProduct({ data, loading }) {
                         }}
                       >
                         <title>Product already in wishlist</title>{" "}
-                        {/* Adding title here for hover effect */}
                         <path
                           fillRule="evenodd"
                           clipRule="evenodd"
@@ -208,11 +145,10 @@ function DetailsDisplayProduct({ data, loading }) {
                         stroke="inherit"
                         onClick={(e) => {
                           e.stopPropagation();
-                          addToWishlist(product._id); // Trigger wishlist add action
+                          addToWishlist(product._id);
                         }}
                       >
                         <title>Add to Wishlist</title>{" "}
-                        {/* Adding title here for hover effect */}
                         <path
                           fillRule="evenodd"
                           clipRule="evenodd"
@@ -223,10 +159,27 @@ function DetailsDisplayProduct({ data, loading }) {
                   </div>
                   <div className="PriceSection space-x-3">
                     {product.variations?.[0] && (
-                      <React.Fragment>
-                        <span>PKR={product.variations[0].price.real}</span>
-                        <span>PKR={product.variations[0].price.discount}</span>
-                      </React.Fragment>
+                      <div className="price flex gap-2">
+                        {product.variations[0].price.discount > 0 &&
+                        product.variations[0].price.discount !==
+                          product.variations[0].price.real ? (
+                          <>
+                            <span className="discount-price text-red-500 font-bold">
+                              Rs. {product.variations[0].price.discount}
+                            </span>
+                            <span
+                              className="original-price line-through"
+                              style={{ color: "var(--text-color)" }}
+                            >
+                              Rs. {product.variations[0].price.real}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="original-price font-bold">
+                            Rs. {product.variations[0].price.real}
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -235,13 +188,6 @@ function DetailsDisplayProduct({ data, loading }) {
           })}
         </div>
       )}
-      {/* {cartPopup && (
-        <Cartpopup
-          cartPopup={cartPopup}
-          closePopup={closePopup}
-          productid={selectproductid}
-        />
-      )} */}
       <Footer />
     </div>
   );

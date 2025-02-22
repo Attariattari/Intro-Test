@@ -6,6 +6,8 @@ import UserContextWrapper from "./Context/UserContextWrapper.jsx";
 import { MeasureProvider } from "./Context/Drawer_state_controller.jsx";
 import { ThemeProvider } from "./Zara_Admin/Context/ThemeContext.jsx";
 import { SidebarProvider } from "./Zara_Admin/Context/SidebarContext.jsx";
+import { WishlistProvider } from "./Context/Wishlist.jsx";
+import { ToastContainer } from "react-toastify";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -13,7 +15,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <MeasureProvider>
         <ThemeProvider>
           <SidebarProvider>
-            <App />
+            <WishlistProvider>
+              <ToastContainer position="top-right" autoClose={3000} />
+              <App />
+            </WishlistProvider>
           </SidebarProvider>
         </ThemeProvider>
       </MeasureProvider>

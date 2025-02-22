@@ -71,13 +71,6 @@ function SmallDisplayProducts({ data, loading }) {
           </>
         ))}
       </div>
-      {/* {cartPopup && (
-        <Cartpopup
-          cartPopup={cartPopup}
-          closePopup={closePopup}
-          productid={selectproductid}
-        />
-      )} */}
       <Footer />
     </div>
   );

@@ -1,14 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import SHIPPING_AND_RETURNS from "../../Offcanvice/SHIPPING_AND_RETURNS";
 import "../SingleProduct.css";
+import { userContext } from "../../../../Context/UserContext";
+import axios from "axios";
+import Spinner from "../../../../Spinner";
+import { useWishlist } from "../../../../Context/Wishlist";
 
 function AllProductDataView({ product, activeVariation, setActiveVariation }) {
   const [drawerType, setDrawerType] = useState(null); // State to manage which drawer is open
   const [selectedSize, setSelectedSize] = useState(null);
-  const [error, setError] = useState(false);
+  const { token } = useContext(userContext);
+  const { wishlistStatus, checkProductInWishlist } = useWishlist();
 
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    if (product?._id) {
+      checkProductInWishlist(product._id); // ✅ Auto-check on component mount
+    }
+  }, [product]);
   useEffect(() => {
     const handleOverflow = () => {
       const body = document.querySelector("body");
@@ -18,13 +29,99 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
         body.style.overflow = "auto";
       }
     };
-
     handleOverflow();
-
     return () => {
       document.body.style.overflow = "auto"; // Ensure overflow is reset on unmount
     };
   }, [drawerType]);
+
+  const addtocart = async () => {
+    setIsLoading(true);
+    window.scrollTo(0, 0);
+    const requestData = {
+      product: product?._id, // ✅ Correct key names as per API
+      variationId: activeVariation?._id,
+      size: selectedSize || null,
+    };
+    console.log("🚀 Sending Data to API:", requestData); // ✅ Debugging
+    try {
+      const response = await axios.post(
+        "http://localhost:1122/CartProduct/add",
+        requestData, // ✅ Data sent in body correctly
+        {
+          headers: {
+            Authenticate: `Bearer ${token}`,
+            "Content-Type": "application/json", // ✅ Ensure JSON format
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("✅ Response Data:", response?.data); // ✅ Debugging
+      if (response.status === 200 || response.status === 201) {
+        Swal.fire({
+          icon: "success",
+          title: "🛍️ Success!",
+          text: "Product added to cart successfully!",
+          // timer: 5000,
+          showConfirmButton: true,
+        });
+        // ✅ Drawer Open After Success
+        openDrawer("AddToCart");
+      } else {
+        console.log("❌ Response Status:", response.status);
+        Swal.fire({
+          icon: "error",
+          title: "❌ Failed",
+          text: "Something went wrong! Try again.",
+          timer: 5000,
+          showConfirmButton: true,
+        });
+      }
+    } catch (error) {
+      console.error("🚨 Error adding product to cart:", error);
+      Swal.fire({
+        icon: "error",
+        title: "❌ Error",
+        text: "Unable to add product. Try again!",
+      });
+    } finally {
+      setIsLoading(false);
+      console.log("🔄 Loading Stopped");
+    }
+  };
+
+  const addToWishlist = async (productId) => {
+    setIsLoading(true);
+    window.scrollTo(0, 0);
+    try {
+      const response = await axios.post(
+        "http://localhost:1122/Wishlist/add",
+        { productId },
+        {
+          headers: { Authenticate: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 200) {
+        // updateWishlistStatus(productId, true);
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Product added to wishlist successfully!",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding product to wishlist:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed to add product to wishlist. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const openDrawer = (drawer) => {
     setDrawerType(drawer);
@@ -36,10 +133,7 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
   };
 
   const handleSizeSelect = (size) => {
-    setSelectedSize(size, () => {
-      // Callback function to execute after state update
-      setError(false); // Reset error when a size is selected
-    });
+    setSelectedSize(size, () => {});
   };
 
   const showErrorModal = () => {
@@ -72,25 +166,60 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
 
   return (
     <div>
+      {isLoading && (
+        <div className="cart-spinner">
+          <Spinner />
+        </div>
+      )}
+
       <div className="Productdetails">
         <span>
           <p>{product.Name.substring(0, 32)}</p>
-          <svg
-            className="wishlist-icon wishlist-icon--productDetail"
-            preserveAspectRatio="xMidYMid slice"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="var(--text-color)"
-            stroke="inherit"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M12 15.238L17 20V4H7v16l5-4.762zm-4 2.429l4-3.81 4 3.81V5H8v12.667z"
-            ></path>
-          </svg>
+          {wishlistStatus[product._id] ? (
+            <svg
+              className="wishlist-icon wishlist-icon--productDetail"
+              preserveAspectRatio="xMidYMid slice"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="var(--text-color)"
+              stroke="inherit"
+              onClick={(e) => {
+                e.stopPropagation();
+                alert("Product already in wishlist!");
+              }}
+            >
+              <title>Product already in wishlist</title>
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12 15.238L17 20V4H7v16l5-4.762z"
+              ></path>
+            </svg>
+          ) : (
+            <svg
+              className="wishlist-icon wishlist-icon--productDetail"
+              preserveAspectRatio="xMidYMid slice"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="var(--text-color)"
+              stroke="inherit"
+              onClick={(e) => {
+                e.stopPropagation();
+                addToWishlist(product?._id);
+              }}
+            >
+              <title>Add to Wishlist</title>
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12 15.238L17 20V4H7v16l5-4.762zm-4 2.429l4-3.81 4 3.81V5H8v12.667z"
+              ></path>
+            </svg>
+          )}
         </span>
         <p className="price">
           {activeVariation?.price?.discount > 0 &&
@@ -195,18 +324,24 @@ function AllProductDataView({ product, activeVariation, setActiveVariation }) {
       </div>
       <button
         className={`AddButton ${selectedSize ? "selected" : ""}`}
-        onClick={(e) => {
+        onClick={async (e) => {
           e.preventDefault();
-          if (selectedSize) {
-            openDrawer("AddToCart");
-            window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-          } else {
+          if (!selectedSize) {
             showErrorModal();
+            return;
+          }
+
+          setIsLoading(true); // ✅ Spinner Show
+          try {
+            await addtocart(); // ✅ API Call
+          } finally {
+            setIsLoading(false); // ✅ Spinner Hide
           }
         }}
       >
         ADD TO CART
       </button>
+
       <div>
         <SHIPPING_AND_RETURNS
           drawerType={drawerType}
